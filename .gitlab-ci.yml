@@ -1,0 +1,12 @@
+include:
+  - https://git.5th.im/lb-public/ci-template/raw/master/ci.yaml
+
+build_fileservice:
+  extends: .docker-login
+  when: manual
+  script:
+    - IMG=docker.longbridge-inc.com/long-bridge-middleware/etcd-operator:$CI_COMMIT_SHORT_SHA make docker-buildx
+
+push_staging_us:
+  extends: .push_staging_us
+  when: manual

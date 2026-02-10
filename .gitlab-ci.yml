@@ -4,8 +4,18 @@ include:
 build_fileservice:
   extends: .docker-login
   when: manual
+  before_script:
+    # Update package list and install required packages
+    - apt update && apt install -y make
+    # Enable Docker buildx experimental features
+    - export DOCKER_CLI_EXPERIMENTAL=enabled
+    # Create and use a new builder instance for buildx
+    - docker buildx ls || docker buildx create --use --name mybuilder --driver docker-container
   script:
     - IMG=docker.longbridge-inc.com/long-bridge-middleware/etcd-operator:$CI_COMMIT_SHORT_SHA make docker-buildx
+  after_script:
+    # Clean up builder instance
+    - docker buildx rm mybuilder || true
 
 push_staging_us:
   extends: .push_staging_us
